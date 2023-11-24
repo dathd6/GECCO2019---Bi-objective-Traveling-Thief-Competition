@@ -1,4 +1,5 @@
 from constants import TEST_FOLDER
+import numpy as np # not sure if this goes here?
 
 class EA:
     def __init__(self, test_name='test-example-n4.txt') -> None:
@@ -21,10 +22,7 @@ class EA:
             node_list.append([eval(j) for j in content_list[i]])  # list of node's coordinates
         del content_list[0:self.number_of_cities+1]
         
-        for i in range(len(node_list)):
-            self.distance_matrix.append([])
-            for j in range(len(node_list)):
-                self.distance_matrix[i].append(self.calc_distance(node_list[j], node_list[j]))
+        self.distance_matrix = self.map_node_coord_to_matrix_distance(node_list) # create distance matrix
 
         self.profit_list = []
         self.weight_list = []
@@ -39,13 +37,11 @@ class EA:
     def generate_initial_population(self):
         pass
 
-    # Task 3: Calculate the distance between two cities #
-    def calc_distance(self, city_i, city_j):
-        return 0
-
     # Task 4: Map imported data node coord to matrix distance matrix
     def map_node_coord_to_matrix_distance(self, node_list):
-        pass
+        node_coords = np.array(node_list).reshape(-1,3)[:,1:] # convert node list into numpy array of x and y coords
+        distance_matrix = np.sqrt(np.sum((node_coords[:, np.newaxis] - node_coords) ** 2, axis=-1)) # create distance matrix from coords
+        return distance_matrix
 
     # Task 15: Replace techniques
     def replacement(self, new_solution_E, new_solution_F):
