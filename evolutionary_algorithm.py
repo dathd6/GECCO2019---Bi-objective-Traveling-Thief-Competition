@@ -1,6 +1,5 @@
 import numpy as np
 from constants import TEST_FOLDER
-import numpy as np # not sure if this goes here?
 
 class EA:
     def __init__(self, test_name='test-example-n4.txt') -> None:
