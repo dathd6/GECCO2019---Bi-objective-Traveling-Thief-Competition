@@ -1,4 +1,6 @@
 import numpy as np
+import random
+import copy
 from constants import TEST_FOLDER
 
 class EA:
