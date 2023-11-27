@@ -217,6 +217,52 @@ class EA:
         children2 = copy.deepcopy(p2_o)
         return children1, children2
 
+    # Task 12: Inversion mutation for TSP
+    '''
+    following mutation function is inversion mutation
+    '''
+    def tsp_inversion_mutation(number_of_cities, parent1 = [], parent2 = []):
+        '''
+        Parameters
+        ----------
+        parent1 : chromosome number one after corssover operation
+        parent2 : chromosome number two after corssover operation
+        children1 : chromosome after mutation operation
+        children1 : chromosome after mutation operation
+        number_of_cities : how many cities in each chromosome
+        Returns
+            children
+        ----------
+        '''
+        '''
+        use deep copy so that further operation won't affect original chromosome
+        '''
+        p1 = copy.deepcopy(parent1)
+        p2 = copy.deepcopy(parent2)
+        '''
+        random generate two unequal inverse point for parent1
+        '''
+        inverse_point1 = random.randint(0, number_of_cities-1)
+        inverse_point2 = random.randint(0, number_of_cities-1)
+        print("inverse points for parent1&2 are ", inverse_point1+1, " ", inverse_point2+1)
+        '''
+        inversion
+        '''
+        p1_head = p1[:inverse_point1]
+        p1_tail = p1[inverse_point1:]
+        p1_tail.reverse()
+        p1_i = p1_head + p1_tail
+        p2_head = p2[:inverse_point2]
+        p2_tail = p2[inverse_point2:]
+        p2_tail.reverse()
+        p2_i = p2_head + p2_tail
+        '''
+        use deepcopy copy the chromosomes to offspring that have finished two-points crossover and fixed
+        '''
+        children1 = copy.deepcopy(p1_i)
+        children2 = copy.deepcopy(p2_i)
+        return children1, children2
+    
     # Task 24: Non-dominated sorting
     def non_dominated_sorting(self):
         # Calculate dominated set for each individual
