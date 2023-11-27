@@ -221,7 +221,7 @@ class EA:
     '''
     following mutation function is inversion mutation
     '''
-    def tsp_inversion_mutation(number_of_cities, parent1 = [], parent2 = []):
+    def tsp_inversion_mutation(self, number_of_cities, parent1 = [], parent2 = []):
         '''
         Parameters
         ----------
