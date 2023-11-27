@@ -48,6 +48,175 @@ class EA:
         distance_matrix = np.sqrt(np.sum((node_coords[:, np.newaxis] - node_coords) ** 2, axis=-1)) # create distance matrix from coords
         return distance_matrix
 
+    # Task 11: Crossover for TSP(two functions. two-points crossover with fix & ordered crossover. choose one)
+    '''
+    following crossover function is a two-points crossover with fix
+    '''
+    def tsp_two_points_crossover(self, number_of_cities, parent1 = [], parent2 = []):
+        '''
+        Parameters
+        ----------
+        parent1 : chromosome number one after tournament selection
+        parent2 : chromosome number two after tournament selection
+        children1 : chromosome after crossover operation
+        children1 : chromosome after crossover operation
+        number_of_cities : how many cities in each chromosome
+        Returns
+            children
+        ----------
+        '''
+        '''
+        use deep copy so that further operation won't affect original chromosome
+        '''
+        p1 = copy.deepcopy(parent1)
+        p2 = copy.deepcopy(parent2) 
+        print("p1 is", p1)
+        print("p2 is", p2)
+        '''
+        random generate two unequal crossover point
+        '''
+        crossover_point1 = random.randint(0, number_of_cities-1)
+        crossover_point2 = random.randint(0, number_of_cities-1)
+        while crossover_point2 == crossover_point1:
+            crossover_point2 = random.randint(0, number_of_cities-1)
+        if crossover_point1 > crossover_point2:
+            temp = crossover_point1
+            crossover_point1 = crossover_point2
+            crossover_point2 = temp
+        #print("c_point1 is ", crossover_point1)
+        #print("c_point2 is ", crossover_point2)    
+        '''
+        store the crossover part into a temporary chain
+        '''
+        chain1 = p1[crossover_point1:crossover_point2]
+        chain2 = p2[crossover_point1:crossover_point2]
+        print("chain1 is " , chain1)
+        print("chain2 is " , chain2)
+        '''
+        do the crossover
+        break the two father chromosome
+        add head of father1,crossover part of father2, tail of father1 together as the children1
+        add head of father2,crossover part of father1, tail of father2 together as the children1
+        '''
+        p1_head = p1[:crossover_point1]
+        p1_tail = p1[crossover_point2:]
+        p1_c = p1_head + chain2 + p1_tail
+        print("p1 crossover is ", p1_c)
+        p2_head = p2[:crossover_point1]
+        p2_tail = p2[crossover_point2:]
+        p2_c = p2_head + chain1 + p2_tail
+        print("p2 crossover is ", p2_c)
+        '''
+        fix p1
+        Compare each gene of the parent1 before crossover point 1 and the crossover part of the offspring to find the duplicate genes
+        find the INDEX of each duplicate gene in the parent2
+        replace the gene in the corresponding position in the part of the parent that was swapped away
+        do these again after crossover point 2, as the tail of the chromosome
+        '''
+        p1_head_fix = []
+        for i in p1[:crossover_point1]:
+            while i in chain2: 
+                i = chain1[chain2.index(i)] 
+            p1_head_fix.append(i)
+        p1_tail_fix = []
+        for i in p1[crossover_point2:]:
+            while i in chain2:
+                i = chain1[chain2.index(i)]
+            p1_tail_fix.append(i)
+        p1_c_f = p1_head_fix + chain2 + p1_tail_fix #set the crossover part untouched and add fixed head part and tail part
+        '''
+        fix p2
+        same method with p1
+        '''
+        p2_head_fix = []
+        for i in p2[:crossover_point1]: 
+            while i in chain1: 
+                i = chain2[chain1.index(i)]
+            p2_head_fix.append(i)
+        p2_tail_fix = []
+        for i in p2[crossover_point2:]:
+            while i in chain1:
+                i = chain2[chain1.index(i)]
+            p2_tail_fix.append(i)
+        p2_c_f = p2_head_fix + chain1 + p2_tail_fix
+        '''
+        use deepcopy copy the chromosomes to offspring that have finished two-points crossover and fixed
+        '''
+        children1 = copy.deepcopy(p1_c_f)
+        children2 = copy.deepcopy(p2_c_f)
+        
+        return children1, children2
+    '''
+    following crossover function is a ordered crossover with fix
+    '''
+    def tsp_ordered_crossover(self, number_of_cities, parent1 = [], parent2 = []):
+        '''
+        Parameters
+        ----------
+        parent1 : chromosome number one after tournament selection
+        parent2 : chromosome number two after tournament selection
+        children1 : chromosome after crossover operation
+        children1 : chromosome after crossover operation
+        city_num : how many cities in each chromosome
+        Returns
+            children
+        ----------
+        '''
+        '''
+        use deep copy so that further operation won't affect original chromosome
+        '''
+        p1 = copy.deepcopy(parent1)
+        p2 = copy.deepcopy(parent2) 
+        #print("p1 is", p1)
+        #print("p2 is", p2)
+        '''
+        random generate two unequal order point
+        '''
+        order_point1 = random.randint(0, number_of_cities-1)
+        order_point2 = random.randint(0, number_of_cities-1)
+        while order_point2 == order_point1:
+            order_point2 = random.randint(0, number_of_cities-1)
+        if order_point1 > order_point2:
+            temp = order_point1
+            order_point1 = order_point2
+            order_point2 = temp
+        #print("o_point1 is ", order_point1)
+        #print("o_point2 is ", order_point2)
+        '''
+        copy genes of father1 between tow order points to the children1
+        '''
+        p1_head = [None]*order_point1
+        p1_tail = [None]*(number_of_cities - order_point2)
+        chain1 = p1[order_point1:order_point2]
+        p1_o = p1_head + chain1 + p1_tail
+        #print("p1_o is ", p1_o)
+        '''
+        copy genes of father2 between tow order points to the children2
+        '''
+        p2_head = [None]*order_point1
+        p2_tail = [None]*(number_of_cities - order_point2)
+        chain2 = p2[order_point1:order_point2]
+        p2_o = p2_head + chain2 + p2_tail
+        #print("p2_o is ", p2_o)
+        '''
+        Fill the p1 remaining genes in the order of parent 2
+        '''
+        p1_remain = [i for i in parent2 if i not in p1_o]
+        p1_o[:order_point1] = p1_remain[:order_point1]
+        p1_o[order_point2:] = p1_remain[order_point1:]
+        '''
+        Fill the p2 remaining genes in the order of parent 1
+        '''
+        p2_remain = [i for i in parent1 if i not in p2_o]
+        p2_o[:order_point1] = p2_remain[:order_point1]
+        p2_o[order_point2:] = p2_remain[order_point1:]
+        '''
+        use deepcopy copy the chromosomes to offspring that have finished ordered corssover
+        '''
+        children1 = copy.deepcopy(p1_o)
+        children2 = copy.deepcopy(p2_o)
+        return children1, children2
+
     # Task 24: Non-dominated sorting
     def non_dominated_sorting(self):
         # Calculate dominated set for each individual
@@ -61,9 +230,9 @@ class EA:
                     current_dominating_set.add(i)
                 elif solution_2 > solution_1 or solution_2 >= solution_1:
                     dominated_counts[-1] += 1
-
+    
             dominating_sets.append(current_dominating_set)
-
+    
         dominated_counts = np.array(dominated_counts)
         fronts = []
         while True:
@@ -71,7 +240,7 @@ class EA:
             if len(current_front) == 0:
                 break
             fronts.append(current_front)
-
+    
             for individual in current_front:
                 dominated_counts[individual] = -1 # this solution is already accounted for, make it -1 so  ==0 will not find it anymore
                 dominated_by_current_set = dominating_sets[individual]
