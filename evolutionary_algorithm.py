@@ -35,8 +35,12 @@ class EA:
             self.city_of_item.append(int(row[3]))        # List entail the i item in which city
 
     # Task 2: Generate initial population
-    def generate_initial_population(self, size_p):
-        pass
+    def generate_initial_population(self, size_p, number_of_cities):
+        for i in range(size_p):
+            chromosome = random.sample(range(number_of_cities), number_of_cities)
+            population.append(chromosome)
+
+        return population
 
     # Task 4: Map imported data node coord to matrix distance matrix
     def map_node_coord_to_matrix_distance(self, node_list):
