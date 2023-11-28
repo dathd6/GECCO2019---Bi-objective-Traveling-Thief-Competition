@@ -1,3 +1,5 @@
+import numpy as np
+
 class TTP:
     # Task 2: Initial the solution #
     def __init__(self, distance_matrix, knapsack_capacity, min_speed, max_speed ,profit_list, weight_list, item_location, route, stolen_items):
@@ -39,11 +41,34 @@ class TTP:
         pass
 
     # Task 7: Fitness TSP: Travelling time #
-    def calc_fitness_travelling_time(self):
-        pass
+    def calc_fitness_travelling_time(self, route=None):
+        return 0
 
     # Task 8: Fitness KP: Total profit #
     def calc_fitness_total_profit(self):
         pass
 
     # Task 28: Local search TSP #
+    def two_opt_change(self, first, second):
+        new_route = np.zeros(self.number_of_cities)
+        new_route[:first] = self.route[:first]
+        new_route[]
+
+    def two_opt(self, best_improvement=False):
+        route = self.route
+        improved = True
+        while improved:
+            improved = False
+            for i in range(1, len(route) - 2):
+                for j in range(i + 1, len(route)):
+                    if j - i == 1:
+                        continue  # changes nothing, skip then
+                    new_route = route[:]    # Creates a copy of route
+                    new_route[i:j] = route[j - 1:i - 1:-1]  # this is the 2-optSwap since j >= i we use -1
+                    if self.calc_fitness_travelling_time(new_route) < self.calc_fitness_travelling_time(route):
+                        route = new_route    # change current route to best
+                        if not best_improvement:
+                            self.route = route
+                            return
+
+        self.route = route

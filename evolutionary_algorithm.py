@@ -41,7 +41,7 @@ class MOEA:
     def generate_initial_population(self, size_p):
         for _ in range(size_p):
             route = random.sample(range(self.number_of_cities), self.number_of_cities)
-            stolen_items = np.random.choice([0, 1], size=(10,))
+            stolen_items = np.random.choice([0, 1], size=(len(self.item_location),))
 
             self.population.append(
                 TTP(
