@@ -2,8 +2,9 @@ import numpy as np
 import random
 import copy
 from constants import TEST_FOLDER
+from travelling_theif_problem import TTP
 
-class EA:
+class MOEA:
     def __init__(self, test_name='test-example-n4.txt') -> None:
         self.population = []
         self.size_p = 0
@@ -29,20 +30,34 @@ class EA:
 
         self.profit_list = []
         self.weight_list = []
-        self.city_of_item = []
+        self.item_location = []
 
         for row in content_list:
             self.profit_list.append(int(row[1]))         #profits of each bags in the nodes 
             self.weight_list.append(int(row[2]))         # weights of individual bags
-            self.city_of_item.append(int(row[3]))        # List entail the i item in which city
+            self.item_location.append(int(row[3]))        # List entail the i item in which city
 
     # Task 2: Generate initial population
-    def generate_initial_population(self, size_p, number_of_cities):
-        for i in range(size_p):
-            chromosome = random.sample(range(number_of_cities), number_of_cities)
-            population.append(chromosome)
+    def generate_initial_population(self, size_p):
+        for _ in range(size_p):
+            route = random.sample(range(self.number_of_cities), self.number_of_cities)
+            stolen_items = np.random.choice([0, 1], size=(10,))
 
-        return population
+            self.population.append(
+                TTP(
+                    self.distance_matrix,
+                    self.knapsack_capacity,
+                    self.min_speed,
+                    self.max_speed,
+                    self.profit_list,
+                    self.weight_list,
+                    self.item_location,
+                    route,
+                    stolen_items
+                )
+            )
+
+        return self.population
 
     # Task 4: Map imported data node coord to matrix distance matrix
     def map_node_coord_to_matrix_distance(self, node_list):

@@ -1,14 +1,17 @@
 class TTP:
     # Task 2: Initial the solution #
-    def __init__(self, distance_matrix, knapsack_capacity, min_speed, max_speed ,profit_list, weight_list, city_of_item):
+    def __init__(self, distance_matrix, knapsack_capacity, min_speed, max_speed ,profit_list, weight_list, item_location, route, stolen_items):
         self.distance_matrix = distance_matrix
         self.knapsack_capacity = knapsack_capacity
         self.min_speed = min_speed
         self.max_speed = max_speed
         self.profit_list = profit_list
         self.weight_list = weight_list
-        self.city_of_item = city_of_item
+        self.city_of_item = item_location
         self.number_of_cities = len(self.distance_matrix)
+
+        self.route = route
+        self.stolen_items = stolen_items
 
         self.travelling_time = self.calc_fitness_travelling_time() 
         self.total_profit = self.calc_fitness_total_profit()
@@ -42,3 +45,5 @@ class TTP:
     # Task 8: Fitness KP: Total profit #
     def calc_fitness_total_profit(self):
         pass
+
+    # Task 28: Local search TSP #
