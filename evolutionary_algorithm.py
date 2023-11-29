@@ -38,10 +38,34 @@ class MOEA:
             self.item_location.append(int(row[3]))        # List entail the i item in which city
 
     # Task 2: Generate initial population
-    def generate_initial_population(self, size_p):
+    def generate_initial_population(self, size_p, number_of_cities, knapscak_capacity, item_num, weight_list, item_location):
+
+        '''
+        Link the two arrays of item location and weight list
+        Sort items according to their location to get a sorted array
+        '''
+        list_zip = zip(item_location, weight_list)
+        list_zip_sorted = sorted(list_zip)
+        item_location_sorted, weight_list_sorted = zip(*list_zip_sorted)
+
+        '''
+        Generate initial population
+        '''
         for _ in range(size_p):
+            #Generate TSP initial population
             route = random.sample(range(self.number_of_cities), self.number_of_cities)
-            stolen_items = np.random.choice([0, 1], size=(len(self.item_location),))
+            
+            #stolen_items = np.random.choice([0, 1], size=(len(self.item_location),))
+            #Generate KP initial population
+            #The total pack weight cannot over capasity
+            total_weight = 0
+            while True:
+                stolen_items = [random.choice([0,1]) for _ in range((number_of_cities-1)*item_num)]
+                for i, item in enumerate(stolen_item):
+                    if item == 1:
+                        total_weight += weight_list_sorted[i]
+                if total_weight <= knapscak_capacity:
+                    break
 
             self.population.append(
                 TTP(
