@@ -40,9 +40,26 @@ class TTP:
     def cal_velocity_at_city(self, i):
         pass
 
-    # Task 7: Fitness TSP: Travelling time #
-    def calc_fitness_travelling_time(self, route=None):
-        return 0
+    # Task 7: Function to calculate fitness: travelling time (t)
+    # todo: After getting the speed fucntion and weight function, I'll refine the code
+    def calc_fitness_travelling_time(self, speed_function, weight_function):
+        total_time = 0
+        total_weight = 0
+        route = self.route  # get the current route
+        # Loop over the current route and calculate the total time
+        for i in range(len(route) - 1):
+            curr_distance = self.distance_matrix[route[i]][route[i + 1]]  # distance between city i and city i+1
+            curr_weight = weight_function(route[i])  # weight of the knapsack at city i
+            if curr_weight > self.knapsack_capacity:  # if the knapsack is overloaded, return infinity
+                total_time = float('inf')  # set the total time to infinity
+                total_weight = -float('inf')  # set the total weight to -infinity
+                break
+            curr_speed = speed_function(curr_weight)  # speed of the vehicle at city i
+            total_time += curr_distance / curr_speed  # add the travelling time to the total time
+            total_weight += curr_weight  # add the weight to the total weight
+        total_time += self.distance_matrix[route[len(route) - 1]][route[0]] / speed_function(
+            total_weight)  # add the travelling time from the last city to the first city
+        return total_time
 
     # Task 8: Fitness KP: Total profit #
     def calc_fitness_total_profit(self):
