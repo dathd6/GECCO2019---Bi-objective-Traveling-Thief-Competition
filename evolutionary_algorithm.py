@@ -84,7 +84,18 @@ class MOEA:
         return self.population
 
     # Task 4: Map imported data node coord to matrix distance matrix
+    '''
+    Generates distance matrix for problem from node_list
+    '''
     def map_node_coord_to_matrix_distance(self, node_list):
+        '''
+        Parameters
+        ----------
+        node_list: list of node coordinates as (node, x, y)
+        distance_matrix: distance matrix is n by n array that gives distance from city i to city j
+        returns
+            distance matrix
+        '''
         node_coords = np.array(node_list).reshape(-1,3)[:,1:] # convert node list into numpy array of x and y coords
         distance_matrix = np.sqrt(np.sum((node_coords[:, np.newaxis] - node_coords) ** 2, axis=-1)) # create distance matrix from coords
         return distance_matrix
@@ -304,6 +315,29 @@ class MOEA:
         children2 = copy.deepcopy(p2_i)
         return children1, children2
     
+    # Task 13: Crossover for KP
+    '''
+    Performs single point crossover for binary 1D arrays for knapsack problem
+    '''
+    def kp_crossover(self, parent_A, parent_B):
+        '''
+        Parameters
+        ----------
+        parent_A: first chromosome for crossover as 1D numpy array
+        parent_B: second chromosome for crossover as 1D numpy array
+        child_A: first chromosome after crossover as 1D numpy array
+        child_B: second chromosome after crossover as 1D numpy array
+        returns
+            children of crossover
+        '''
+        parent_A, parent_B = parent_A.tolist(), parent_B.tolist() # Convert parents to lists
+        crossover_point = np.random.randint(0,len(parent_A)) # Generate random crossover point
+        # print(crossover_point)
+        child_A = parent_A[:crossover_point] + parent_B[crossover_point:] # Gererate child_A from parents
+        child_B = parent_B[:crossover_point] + parent_A[crossover_point:] # Generate child_B from parents
+        child_A, child_B = np.array(child_A), np.array(child_B) # Convert children back to 1D numpy arrays
+    return child_A, child_B
+
     # Task 24: Non-dominated sorting
     def non_dominated_sorting(self):
         # Calculate dominated set for each individual
