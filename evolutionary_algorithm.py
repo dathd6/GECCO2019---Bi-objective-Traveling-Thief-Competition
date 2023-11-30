@@ -338,6 +338,13 @@ class MOEA:
         child_A, child_B = np.array(child_A), np.array(child_B) # Convert children back to 1D numpy arrays
     return child_A, child_B
 
+    # Task 14: Mutation for KP (inversion mutation)
+    def kp_mutation(self, parent):
+        point1, point2 = sorted(random.sample(range(len(parent)), 2))  # choose 2 different points
+        sub = parent[point1:point2 + 1]  # get the subsequence from z
+        parent[point1:point2 + 1] = reversed(sub)  # reverse the subsequence
+        return parent  # return the mutated parent(new stolen_items
+
     # Task 24: Non-dominated sorting
     def non_dominated_sorting(self):
         # Calculate dominated set for each individual
