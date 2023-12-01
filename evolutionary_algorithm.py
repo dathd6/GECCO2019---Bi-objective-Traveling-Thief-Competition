@@ -37,6 +37,10 @@ class MOEA:
             self.weight_list.append(int(row[2]))         # weights of individual bags
             self.item_location.append(int(row[3]))        # List entail the i item in which city
 
+        list_zip = zip(self.item_location, self.profit_list, self.weight_list)
+        list_zip_sorted = sorted(list_zip)
+        self.item_location, self.profit_list, self.weight_list = zip(*list_zip_sorted)
+
     # Task 2: Generate initial population
     def generate_initial_population(self, size_p, number_of_cities, knapscak_capacity, item_num, weight_list, item_location):
 
