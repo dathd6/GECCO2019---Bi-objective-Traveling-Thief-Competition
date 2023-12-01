@@ -36,9 +36,18 @@ class TTP:
     def cal_weight_at_city(self, i):
         pass
 
-    # Task 6: Calculate velocity at city i #
+    # Task 6: Calculate velocity at city i
     def cal_velocity_at_city(self, i):
-        pass
+        # function takes route index, i, and reutrns current velocity at that point in route
+        current_weight = self.cal_weight_at_city(i) # Obtain weight at city i
+        current_capacity = current_weight/self.knapsack_capacity # Calc current capacity
+        velocity_reduction = current_capacity*(self.max_speed - self.min_speed) # Calc velocity reduction due to weight
+        if current_weight <= self.knapsack_capacity:
+            current_velocity = self.max_speed - velocity_reduction # If weight<=capacity return reduced velocity
+        else:
+            current_velocity = self.min_speed # return min velocity if overcapacity for invalid solutions
+        return current_velocity
+
 
     # Task 7: Function to calculate fitness: travelling time (t)
     # todo: After getting the speed fucntion and weight function, I'll refine the code
