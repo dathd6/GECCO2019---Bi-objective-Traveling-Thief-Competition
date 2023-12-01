@@ -336,7 +336,7 @@ class MOEA:
         child_A = parent_A[:crossover_point] + parent_B[crossover_point:] # Gererate child_A from parents
         child_B = parent_B[:crossover_point] + parent_A[crossover_point:] # Generate child_B from parents
         child_A, child_B = np.array(child_A), np.array(child_B) # Convert children back to 1D numpy arrays
-    return child_A, child_B
+        return child_A, child_B
 
     # Task 14: Mutation for KP (inversion mutation)
     def kp_mutation(self, parent):
