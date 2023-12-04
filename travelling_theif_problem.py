@@ -34,7 +34,16 @@ class TTP:
     
     # Task 5: Calculate weight at city i #
     def cal_weight_at_city(self, i):
-        pass
+        distance_matrix = self.distance_matrix
+        route = self.route
+        weight = self.weight_list
+        total_weight = 0
+        for k in range(len(route)):
+            item_in_city = np.where(self.city_of_item == route[k])[0]
+            for j in item_in_city:
+                if z[j]:  #Z[j] denotes take or leave
+                    total_weight += weight[j]
+        return total_weight
 
     # Task 6: Calculate velocity at city i
     def cal_velocity_at_city(self, i):
@@ -72,7 +81,11 @@ class TTP:
 
     # Task 8: Fitness KP: Total profit #
     def calc_fitness_total_profit(self):
-        pass
+        total_profit = 0
+        for item,is_stolen in enumerate(self.stolen_items):
+            if is_stolen:
+                total_profit += self.profit_list[item]
+        return total_profit
 
     # Task 28: Local search TSP #
     def two_opt_change(self, first, second):
