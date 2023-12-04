@@ -35,16 +35,17 @@ class TTP:
     # Task 5: Calculate weight at city i #
     def cal_weight_at_city(self, i):
         distance_matrix = self.distance_matrix
+        stolen_items = self.stolen_items
         route = self.route
         weight = self.weight_list
         total_weight = 0
         for k in range(len(route)):
             item_in_city = np.where(self.city_of_item == route[k])[0]
             for j in item_in_city:
-                if z[j]:  #Z[j] denotes take or leave
+                if stolen_items[j]:  #Z[j] denotes take or leave
                     total_weight += weight[j]
         return total_weight
-
+        
     # Task 6: Calculate velocity at city i
     def cal_velocity_at_city(self, i):
         # function takes route index, i, and reutrns current velocity at that point in route
