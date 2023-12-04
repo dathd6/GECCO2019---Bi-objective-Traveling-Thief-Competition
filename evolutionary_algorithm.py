@@ -412,6 +412,20 @@ class MOEA:
                     crowding_distance[sorted_front[i]]['value'] += fitnesses[i, sorted_front[i + 1]] - fitnesses[i, sorted_front[i - 1]]
 
         return crowding_distance
+        
+    #Task 16: visualize and like in the requirement
+    def visualize(self,fronts):
+        pareto_value = [(index.fitnesses.values[0],index.fitnesses.values[1]) for index in fronts ]
+        plt.scatter([v[0] for v in pareto_value],[v[1] for v in pareto_value])
+        plt.xlabel('total_profit')
+        plt.ylabel('total_time')
+        plt.grid()
+        plt.show()
+
+        with open('pareto_front.csv','w') as f:
+            f.write("total_profit total_time\n")
+            for values in pareto_value:
+                f.write(f"{values[0]},{values[1]}\n")
     
     # Task 15: Replace techniques (Elitism)
     def replacement(self):
