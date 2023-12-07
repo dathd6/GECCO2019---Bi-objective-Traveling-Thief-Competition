@@ -57,7 +57,7 @@ class MOEA:
         '''
         for _ in range(size_p):
             #Generate TSP initial population
-            route = random.sample(range(self.number_of_cities), self.number_of_cities)
+            route = random.sample(range(1, self.number_of_cities+1), self.number_of_cities)
             #Generate KP initial population
             number_of_items = len(self.item_location)
             stolen_items = np.random.randint(2, size=number_of_items)
