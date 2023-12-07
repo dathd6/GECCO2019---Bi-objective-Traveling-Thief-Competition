@@ -58,9 +58,10 @@ class MOEA:
         for _ in range(size_p):
             #Generate TSP initial population
             route = random.sample(range(self.number_of_cities), self.number_of_cities)
-            
-            #stolen_items = np.random.choice([0, 1], size=(len(self.item_location),))
             #Generate KP initial population
+            number_of_items = len(item_location)
+            stolen_items = np.random.randint(2, size=number_of_items)
+            '''
             #The total pack weight cannot over capasity
             total_weight = 0
             while True:
@@ -70,7 +71,8 @@ class MOEA:
                         total_weight += weight_list_sorted[i]
                 if total_weight <= knapscak_capacity:
                     break
-
+            '''
+            
             self.population.append(
                 TTP(
                     self.distance_matrix,
