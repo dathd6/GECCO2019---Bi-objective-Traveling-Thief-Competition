@@ -43,15 +43,7 @@ class MOEA:
 
     # Task 2: Generate initial population
     def generate_initial_population(self, size_p, number_of_cities, knapscak_capacity, item_num, weight_list, item_location):
-
-        '''
-        Link the two arrays of item location and weight list
-        Sort items according to their location to get a sorted array
-        '''
-        list_zip = zip(item_location, weight_list)
-        list_zip_sorted = sorted(list_zip)
-        item_location_sorted, weight_list_sorted = zip(*list_zip_sorted)
-
+        
         '''
         Generate initial population
         '''
