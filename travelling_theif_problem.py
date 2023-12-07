@@ -39,8 +39,8 @@ class TTP:
         route = self.route
         weight = self.weight_list
         total_weight = 0
-        for k in range(len(route)):
-            item_in_city = np.where(self.city_of_item == route[k])[0]
+        for i in range(len(route)):
+            item_in_city = np.where(self.city_of_item == route[i])[0]
             for j in item_in_city:
                 if stolen_items[j]:  #Z[j] denotes take or leave
                     total_weight += weight[j]
