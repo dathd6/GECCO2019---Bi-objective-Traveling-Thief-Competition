@@ -29,12 +29,10 @@ class TTP:
                (self.total_profit == other.total_profit)
     def __ge__(self, other):
         # Weakly dominance
-        return (self.total_profit >= other.total_profit and self.travelling_time < other.travelling_time) or \
-               (self.travelling_time <= other.travelling_time and self.total_profit > other.total_point)
+        return self.total_profit >= other.total_profit and self.travelling_time <= other.travelling_time
     
     # Task 5: Calculate weight at city i #
     def cal_weight_at_city(self, i):
-        distance_matrix = self.distance_matrix
         stolen_items = self.stolen_items
         route = self.route
         weight = self.weight_list
@@ -88,12 +86,8 @@ class TTP:
         return total_profit
 
     # Task 28: Local search TSP #
-    def two_opt_change(self, first, second):
-        new_route = np.zeros(self.number_of_cities)
-        new_route[:first] = self.route[:first]
-        new_route[]
-
     def two_opt(self, best_improvement=False):
+        new_route = self.route.copy()
         route = self.route
         improved = True
         while improved:
@@ -111,3 +105,6 @@ class TTP:
                             return
 
         self.route = route
+
+    def get_fitness(self):
+        return np.array([self.travelling_time, self.total_profit])

@@ -1,18 +1,33 @@
 import numpy as np
 import random
 import copy
+import matplotlib.pyplot as plt
 from constants import TEST_FOLDER
 from travelling_theif_problem import TTP
 
+LIMIT_SOLUTION = {
+    'a280-n279': 100,
+    'a280-n1395': 100,
+    'a280-n2790': 100,
+    'fnl4461-n4460': 50,
+    'fnl4461-n22300': 50,
+    'fnl4461-n44600': 50,
+    'pla33810-n33809': 20,
+    'pla33810-n169045': 20,
+    'pla33810-n338090': 20
+}
+
 class MOEA:
-    def __init__(self, test_name='test-example-n4.txt') -> None:
+    def __init__(self, test_name='test-example-n4') -> None:
+        self.n_objectives = 2
         self.population = []
         self.size_p = 0
         self.distance_matrix = [] # 2D Array contains cost of the edges between vertices
+        self.test_name = test_name
 
         # Task 1: Extract data from test problem file #
         content_list = []
-        test_file = open(f"{TEST_FOLDER}/{test_name}")
+        test_file = open(f"{TEST_FOLDER}/{test_name}.txt")
         for i in test_file :
             content_list.append(i.split())
 
@@ -20,6 +35,7 @@ class MOEA:
         self.knapsack_capacity = int(content_list[4][-1])  # threshold value
         self.min_speed = float(content_list[5][-1])        # minimum speed
         self.max_speed = float(content_list[6][-1])       # maximum speed
+        self.renting_ratio = float(content_list[7][-1]) # renting ratio
         del content_list[0:10]                     
         node_list = []                            
         for i in range(self.number_of_cities):
@@ -42,7 +58,9 @@ class MOEA:
         self.item_location, self.profit_list, self.weight_list = zip(*list_zip_sorted)
 
     # Task 2: Generate initial population
-    def generate_initial_population(self, size_p, number_of_cities, knapscak_capacity, item_num, weight_list, item_location):
+    def generate_initial_population(self, size_p):
+        self.size_p = size_p
+        population = []
         
         '''
         Generate initial population
@@ -66,7 +84,7 @@ class MOEA:
                     break
             '''
             
-            self.population.append(
+            population.append(
                 TTP(
                     self.distance_matrix,
                     self.knapsack_capacity,
@@ -79,9 +97,8 @@ class MOEA:
                     stolen_items
                 )
             )
-
-        return self.population
-
+        self.population = np.array(population)
+        
     # Task 4: Map imported data node coord to matrix distance matrix
     '''
     Generates distance matrix for problem from node_list
@@ -103,7 +120,7 @@ class MOEA:
     '''
     following crossover function is a two-points crossover with fix
     '''
-    def tsp_two_points_crossover(self, number_of_cities, parent1 = [], parent2 = []):
+    def tsp_two_points_crossover(self, parent1 = [], parent2 = []):
         '''
         Parameters
         ----------
@@ -121,28 +138,22 @@ class MOEA:
         '''
         p1 = copy.deepcopy(parent1)
         p2 = copy.deepcopy(parent2) 
-        print("p1 is", p1)
-        print("p2 is", p2)
         '''
         random generate two unequal crossover point
         '''
-        crossover_point1 = random.randint(0, number_of_cities-1)
-        crossover_point2 = random.randint(0, number_of_cities-1)
+        crossover_point1 = random.randint(0, self.number_of_cities-1)
+        crossover_point2 = random.randint(0, self.number_of_cities-1)
         while crossover_point2 == crossover_point1:
-            crossover_point2 = random.randint(0, number_of_cities-1)
+            crossover_point2 = random.randint(0, self.number_of_cities-1)
         if crossover_point1 > crossover_point2:
             temp = crossover_point1
             crossover_point1 = crossover_point2
             crossover_point2 = temp
-        #print("c_point1 is ", crossover_point1)
-        #print("c_point2 is ", crossover_point2)    
         '''
         store the crossover part into a temporary chain
         '''
         chain1 = p1[crossover_point1:crossover_point2]
         chain2 = p2[crossover_point1:crossover_point2]
-        print("chain1 is " , chain1)
-        print("chain2 is " , chain2)
         '''
         do the crossover
         break the two father chromosome
@@ -152,11 +163,9 @@ class MOEA:
         p1_head = p1[:crossover_point1]
         p1_tail = p1[crossover_point2:]
         p1_c = p1_head + chain2 + p1_tail
-        print("p1 crossover is ", p1_c)
         p2_head = p2[:crossover_point1]
         p2_tail = p2[crossover_point2:]
         p2_c = p2_head + chain1 + p2_tail
-        print("p2 crossover is ", p2_c)
         '''
         fix p1
         Compare each gene of the parent1 before crossover point 1 and the crossover part of the offspring to find the duplicate genes
@@ -200,7 +209,7 @@ class MOEA:
     '''
     following crossover function is a ordered crossover with fix
     '''
-    def tsp_ordered_crossover(self, number_of_cities, parent1 = [], parent2 = []):
+    def tsp_ordered_crossover(self, parent1 = [], parent2 = []):
         '''
         Parameters
         ----------
@@ -218,37 +227,31 @@ class MOEA:
         '''
         p1 = copy.deepcopy(parent1)
         p2 = copy.deepcopy(parent2) 
-        #print("p1 is", p1)
-        #print("p2 is", p2)
         '''
         random generate two unequal order point
         '''
-        order_point1 = random.randint(0, number_of_cities-1)
-        order_point2 = random.randint(0, number_of_cities-1)
+        order_point1 = random.randint(0, self.number_of_cities-1)
+        order_point2 = random.randint(0, self.number_of_cities-1)
         while order_point2 == order_point1:
-            order_point2 = random.randint(0, number_of_cities-1)
+            order_point2 = random.randint(0, self.number_of_cities-1)
         if order_point1 > order_point2:
             temp = order_point1
             order_point1 = order_point2
             order_point2 = temp
-        #print("o_point1 is ", order_point1)
-        #print("o_point2 is ", order_point2)
         '''
         copy genes of father1 between tow order points to the children1
         '''
         p1_head = [None]*order_point1
-        p1_tail = [None]*(number_of_cities - order_point2)
+        p1_tail = [None]*(self.number_of_cities - order_point2)
         chain1 = p1[order_point1:order_point2]
         p1_o = p1_head + chain1 + p1_tail
-        #print("p1_o is ", p1_o)
         '''
         copy genes of father2 between tow order points to the children2
         '''
         p2_head = [None]*order_point1
-        p2_tail = [None]*(number_of_cities - order_point2)
+        p2_tail = [None]*(self.number_of_cities - order_point2)
         chain2 = p2[order_point1:order_point2]
         p2_o = p2_head + chain2 + p2_tail
-        #print("p2_o is ", p2_o)
         '''
         Fill the p1 remaining genes in the order of parent 2
         '''
@@ -272,7 +275,7 @@ class MOEA:
     '''
     following mutation function is inversion mutation
     '''
-    def tsp_inversion_mutation(self, number_of_cities, parent1 = [], parent2 = []):
+    def tsp_inversion_mutation(self, parent1 = [], parent2 = []):
         '''
         Parameters
         ----------
@@ -293,9 +296,8 @@ class MOEA:
         '''
         random generate two unequal inverse point for parent1
         '''
-        inverse_point1 = random.randint(0, number_of_cities-1)
-        inverse_point2 = random.randint(0, number_of_cities-1)
-        print("inverse points for parent1&2 are ", inverse_point1+1, " ", inverse_point2+1)
+        inverse_point1 = random.randint(0, self.number_of_cities-1)
+        inverse_point2 = random.randint(0, self.number_of_cities-1)
         '''
         inversion
         '''
@@ -329,117 +331,204 @@ class MOEA:
         returns
             children of crossover
         '''
-        parent_A, parent_B = parent_A.tolist(), parent_B.tolist() # Convert parents to lists
-        crossover_point = np.random.randint(0,len(parent_A)) # Generate random crossover point
-        # print(crossover_point)
-        child_A = parent_A[:crossover_point] + parent_B[crossover_point:] # Gererate child_A from parents
-        child_B = parent_B[:crossover_point] + parent_A[crossover_point:] # Generate child_B from parents
-        child_A, child_B = np.array(child_A), np.array(child_B) # Convert children back to 1D numpy arrays
+        p1 = copy.deepcopy(parent_A)
+        p2 = copy.deepcopy(parent_B)
+        # parent_A, parent_B = parent_A.tolist(), parent_B.tolist() # Convert parents to lists
+        crossover_point = np.random.randint(0,len(p1)) # Generate random crossover point
+        child_A = p1[:crossover_point] + p2[crossover_point:] # Gererate child_A from parents
+        child_B = p2[:crossover_point] + p1[crossover_point:] # Generate child_B from parents
         return child_A, child_B
 
     # Task 14: Mutation for KP (inversion mutation)
     def kp_mutation(self, parent):
         point1, point2 = sorted(random.sample(range(len(parent)), 2))  # choose 2 different points
         sub = parent[point1:point2 + 1]  # get the subsequence from z
-        parent[point1:point2 + 1] = reversed(sub)  # reverse the subsequence
+        parent[point1:point2 + 1] = sub[::-1]  # reverse the subsequence
         return parent  # return the mutated parent(new stolen_items
 
     # Task 24: Non-dominated sorting
     def non_dominated_sorting(self):
-        # Calculate dominated set for each individual
+        """Fast non-dominated sorting to get list Pareto Fronts"""
         dominating_sets = []
         dominated_counts = []
+
+        # For each solution:
+        # - Get solution index that dominated by current solution
+        # - Count number of solution dominated current solution
         for solution_1 in self.population:
             current_dominating_set = set()
             dominated_counts.append(0)
             for i, solution_2 in enumerate(self.population):
-                if solution_1 > solution_2 or solution_1 >= solution_2:
+                if solution_1 >= solution_2 and not solution_1 == solution_2:
                     current_dominating_set.add(i)
-                elif solution_2 > solution_1 or solution_2 >= solution_1:
+                elif solution_2 >= solution_1 and not solution_2 == solution_1:
                     dominated_counts[-1] += 1
-    
             dominating_sets.append(current_dominating_set)
-    
+
         dominated_counts = np.array(dominated_counts)
-        fronts = []
+        self.fronts = []
+
+        # Append all the pareto fronts and stop when there is no solution being dominated (domintead count = 0)
         while True:
             current_front = np.where(dominated_counts==0)[0]
             if len(current_front) == 0:
                 break
-            fronts.append(current_front)
-    
+            self.fronts.append(current_front)
             for individual in current_front:
-                dominated_counts[individual] = -1 # this solution is already accounted for, make it -1 so  ==0 will not find it anymore
+                dominated_counts[individual] = -1 # this solution is already accounted for, make it -1 so will not find it anymore
                 dominated_by_current_set = dominating_sets[individual]
                 for dominated_by_current in dominated_by_current_set:
                     dominated_counts[dominated_by_current] -= 1
-        return fronts
                 
     # Task 25: Crowding Distance
-    def crowding_distance(self, front):
-        fitnesses = np.array([
-            [solution.total_profit for solution in self.population],
-            [solution.travelling_time for solution in self.population]
-        ])
-    
-        num_objectives = 2
-        num_solutions = self.size_p * 2
+    def calc_crowding_distance(self):
+        self.crowding_distance = np.zeros(len(self.population))
+
+        for front in self.fronts:
+            fitnesses = np.array([
+                solution.get_fitness() for solution in self.population[front]
+            ])
         
-        # Normalise each objectives, so they are in the range [0,1]
-        # This is necessary, so each objective's contribution have the same magnitude to the crowding distance.
-        normalized_fitnesses = np.zeros_like(fitnesses)
+            # Normalise each objectives, so they are in the range [0,1]
+            # This is necessary, so each objective's contribution have the same magnitude to the crowding distance.
+            normalized_fitnesses = np.zeros_like(fitnesses)
 
-        for i in range(num_objectives):
-            min_val = np.min(fitnesses[i, :])
-            max_val = np.max(fitnesses[i, :])
-            val_range = max_val - min_val
-            normalized_fitnesses[i, :] = fitnesses[i, :] - min_val / val_range
-        
-        crowding_distance = [{ 'value': 0, 'index': i } for i in range(num_solutions)]
+            for j in range(self.n_objectives):
+                min_val = np.min(fitnesses[:, j])
+                max_val = np.max(fitnesses[:, j])
+                val_range = max_val - min_val
+                normalized_fitnesses[:, j] = (fitnesses[:, j] - min_val) / val_range
 
-        for i in range(num_objectives):
-            sorted_front = sorted(front, key = lambda x : fitnesses[i, x])
-            
-            crowding_distance[sorted_front[0]]['value'] = np.inf
-            crowding_distance[sorted_front[-1]]['value'] = np.inf
-            if len(sorted_front) > 2:
-                for i in range(1, len(sorted_front) - 1):
-                    crowding_distance[sorted_front[i]]['value'] += fitnesses[i, sorted_front[i + 1]] - fitnesses[i, sorted_front[i - 1]]
-
-        return crowding_distance
+            for j in range(self.n_objectives):
+                idx = np.argsort(fitnesses[:, j])
+                
+                self.crowding_distance[idx[0]] = np.inf
+                self.crowding_distance[idx[-1]] = np.inf
+                if len(idx) > 2:
+                    for i in range(1, len(idx) - 1):
+                        self.crowding_distance[idx[i]] += normalized_fitnesses[idx[i + 1], j] - normalized_fitnesses[idx[i - 1], j]
         
     #Task 16: visualize and like in the requirement
-    def visualize(self,fronts):
-        pareto_value = [(index.fitnesses.values[0],index.fitnesses.values[1]) for index in fronts ]
-        plt.scatter([v[0] for v in pareto_value],[v[1] for v in pareto_value])
-        plt.xlabel('total_profit')
-        plt.ylabel('total_time')
+    def visualize(self):
+        for front in self.fronts:
+            pareto_value = np.array([solution.get_fitness() for solution in self.population[front]])
+            plt.scatter(
+                pareto_value[:, 0],
+                pareto_value[:, 1],
+            )
+        plt.xlabel('travelling time')
+        plt.ylabel('total profit')
         plt.grid()
         plt.show()
 
-        with open('pareto_front.csv','w') as f:
-            f.write("total_profit total_time\n")
-            for values in pareto_value:
-                f.write(f"{values[0]},{values[1]}\n")
+    def export_result(self):
+        DIR = 'test_results/'
+        with open(f'{DIR}/TeamU_{self.test_name}.f','w') as f:
+            count = 0
+            for solution in self.population[self.fronts[0]]:
+                f.write(f"{solution.travelling_time} {solution.total_profit}\n")
+                count += 1
+                if count == LIMIT_SOLUTION[self.test_name]:
+                    break
+
+        with open(f'{DIR}/TeamU_{self.test_name}.x','w') as f:
+            count = 0
+            for solution in self.population[self.fronts[0]]:
+                f.write(f"{str(solution.route)[1:-1].replace(',', '')}\n")
+                f.write(f"{str(solution.stolen_items)[1:-1].replace(',', '')}\n")
+                f.write('\n')
+                count += 1
+                if count == LIMIT_SOLUTION[self.test_name]:
+                    break
     
     # Task 15: Replace techniques (Elitism)
-    def replacement(self):
-        fronts = self.non_dominated_sorting()
-        elitism = self.population.copy()
-        self.population = []
-        len_current_pop = 0
-        self.fronts = []
+    def elitism_replacement(self):
+        elitism = copy.deepcopy(self.population)
+        population = []
         
         i = 0
-        while len(fronts[i]) + len(self.population) <= self.size_p:
-            self.fronts.append([])
-            for index in fronts[i]:
-                self.population.append(elitism[index])
-                self.fronts[i].append(len_current_pop)
-                len_current_pop += 1
+        while len(self.fronts[i]) + len(population) <= self.size_p:
+            for solution in elitism[self.fronts[i]]:
+                population.append(solution)
             i += 1
-        ranking_front = sorted(self.crowding_distance(fronts[i]), key = lambda x: -x['value'])
-        for r in ranking_front[0:(self.size_p - len(self.population))]:
-            self.population.append(elitism[r['index']])
-            self.fronts[i].append(len_current_pop)
-            len_current_pop += 1 
+
+        front = self.fronts[i]
+        ranking_index = front[np.argsort(self.crowding_distance[front])]
+        current_pop_len = len(population)
+        for index in ranking_index[current_pop_len:self.size_p]:
+            population.append(elitism[index])
+        self.population = np.array(population)
+
+
+    # Task 10: Tournament selection
+    def tournament_selection(self):
+        tournament = np.array([True] * self.size_t + [False] * (self.size_p - self.size_t))
+        results = []
+        for _ in range(2):
+            np.random.shuffle(tournament)
+            front = []
+            for f in self.fronts:
+                front = []
+                for index in f:
+                    if tournament[index] == 1:
+                        front.append(index)
+                if len(front) > 0:
+                    break
+            max_index = np.argmax(self.crowding_distance[front])
+            results.append(self.population[front[max_index]])
+        return results
+
+
+    # Task 36: Optimization
+    def optimize(self, generations, tournament_size, crossover='OX'):
+        self.size_t = tournament_size
+
+        for generation in range(generations):
+            print('Generation: ', generation + 1)
+            new_solutions = []
+            self.non_dominated_sorting()
+            self.calc_crowding_distance()
+            while len(self.population) + len(new_solutions) < 2 * self.size_p:
+                parents = self.tournament_selection()
+                if crossover == 'PMX':
+                    route_child_a, route_child_b = self.tsp_two_points_crossover(parents[0].route, parents[1].route)
+                else:
+                    route_child_a, route_child_b = self.tsp_ordered_crossover(parents[0].route, parents[1].route)
+                stolen_child_a, stolen_child_b = self.kp_crossover(parents[0].stolen_items, parents[1].stolen_items)
+                new_route_c, new_route_d = self.tsp_inversion_mutation(route_child_a, route_child_b)
+                new_stolen_c = self.kp_mutation(stolen_child_a) 
+                new_stolen_d = self.kp_mutation(stolen_child_b) 
+
+                new_solutions.append(
+                    TTP(
+                        self.distance_matrix,
+                        self.knapsack_capacity,
+                        self.min_speed,
+                        self.max_speed,
+                        self.profit_list,
+                        self.weight_list,
+                        self.item_location,
+                        new_route_c,
+                        new_stolen_c
+                    )
+                )
+                new_solutions.append(
+                    TTP(
+                        self.distance_matrix,
+                        self.knapsack_capacity,
+                        self.min_speed,
+                        self.max_speed,
+                        self.profit_list,
+                        self.weight_list,
+                        self.item_location,
+                        new_route_d,
+                        new_stolen_d
+                    )
+                )
+
+            self.population = np.append(self.population, new_solutions)
+            self.non_dominated_sorting()
+            self.calc_crowding_distance()
+            self.elitism_replacement()
+        self.non_dominated_sorting()
+        self.calc_crowding_distance()
