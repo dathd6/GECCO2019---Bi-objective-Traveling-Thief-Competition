@@ -533,39 +533,4 @@ class MOEA:
         self.non_dominated_sorting()
         self.calc_crowding_distance()
 
-    # Task10 Crowding Tournament selection
-    def crowding_tournament_selection(self):
-        results = []
-        tournament_size = self.size_t
-
-        self.non_dominated_sorting()     # apply non-dominated sorting to update the non-dominant rank
-
-        for _ in range(self.size_p):
-            tournament_select = np.random.choice(range(len(self.population)), tournament_size, replace=False)  # random selection
-
-            selected = [self.population[i] for i in tournament_select] # find the selected individuals
-
-            # determine the dominate rank of each individual
-            front_ranks = []
-            for individual in selected:
-                for i, front in enumerate(self.fronts):
-                    if individual in front:
-                        front_ranks.append(i)
-                        break
-                else:
-                    front_ranks.append(len(self.fronts))  # if not in any front, then it is the last front
-
-            # select the highest rank of individual
-            min_rank = min(front_ranks)
-            candidates = [selected[i] for i in range(len(selected)) if front_ranks[i] == min_rank]
-
-            # if more than one candidate, select the one with the highest crowding distance
-            if len(candidates) > 1:
-                crowding_distances = [self.crowding_distance[self.population.index(individual)] for individual in candidates]
-                max_distance = max(crowding_distances)
-                max_index = crowding_distances.index(max_distance)
-                results = candidates[max_index]
-            else:
-                results.append(candidates[0])
-
-        return results
+    
