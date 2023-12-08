@@ -532,5 +532,69 @@ class MOEA:
             self.elitism_replacement()
         self.non_dominated_sorting()
         self.calc_crowding_distance()
+        
+    # Task 27: Local search for KP (constructing knapsack random, simulate annealing function)
+    def evaluate_solution(solution, weight_list, profit_list, knapsack_capacity):
+        total_weight = sum(solution[i] * weight_list[i] for i in range(len(solution)))
+        total_profit = sum(solution[i] * profit_list[i] for i in range(len(solution)))
+    
+        if total_weight > knapsack_capacity:
+            total_profit = 0  # Setting the total profit of the overweight solution to zero
+    
+        return total_profit
+    
+    def generate_neighbor(solution):
+        neighbor = solution[:]  # Create a copy of the current solution
+        index = random.randint(0, len(neighbor) - 1)  # Randomly select an item
+        neighbor[index] = 1 - neighbor[index]  # change the selected state of the item
+        index1 = random.randint(0, len(neighbor) - 1)  # Randomly select another item
+        neighbor[index] = 1 - neighbor[index1]  # change the selected state of the item
+        #print('first item changed number: ', index)
+        #print('second item changed number: ', index1)
+        return neighbor
 
+    def simulated_annealing(weight_list, profit_list, knapsack_capacity, initial_temp=1000, min_temp=0.1, alpha=0.95, max_iter=10):
+        current_solution = [random.choice([0,1]) for _ in range(len(weight_list))]# Random generation of initial solutions
+        # Make sure this solution is not overweight
+        while sum(current_solution[i] * weight_list[i] for i in range(len(current_solution))) > knapsack_capacity:
+            current_solution = [random.choice([0,1]) for _ in range(len(weight_list))]
+        current_value = evaluate_solution(current_solution, weight_list, profit_list, knapsack_capacity)
+        best_solution = current_solution[:]
+        best_value = current_value
+    
+        current_temp = initial_temp
+        no_improve_iter = 0  # Tracking the number of consecutive unimproved iterations
+    
+        for j in range(max_iter):
+            #print('iteration: ' , j)
+            if current_temp <= min_temp:
+                break
+    
+            neighbor = generate_neighbor(current_solution)
+            neighbor_value = evaluate_solution(neighbor, weight_list, profit_list, knapsack_capacity)
+    
+            delta = neighbor_value - current_value
+    
+            if delta > 0 or random.uniform(0, 1) < math.exp(delta / current_temp):
+                current_solution = neighbor[:]
+                current_value = neighbor_value
+    
+                if current_value > best_value:
+                    best_solution = current_solution[:]
+                    best_value = current_value
+                    no_improve_iter = 0  # Reset the unimproved iteration counter
+                else:
+                    no_improve_iter += 1
+            else:
+                no_improve_iter += 1
+    
+            # Adaptive Cooling Strategies
+            if no_improve_iter > 20:  # If 20 consecutive iterations do not improve
+                current_temp *= alpha ** 2  # speedup cooling
+            else:
+                current_temp *= alpha
+            
+            #print('current iteration value: ', current_value )
+    
+        return best_solution, best_value
     
