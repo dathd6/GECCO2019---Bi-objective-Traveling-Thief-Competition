@@ -6,7 +6,6 @@ from constants import TEST_FOLDER
 from travelling_theif_problem import TTP
 
 LIMIT_SOLUTION = {
-    'test-example-n4': 100,
     'a280-n279': 100,
     'a280-n1395': 100,
     'a280-n2790': 100,
@@ -15,7 +14,7 @@ LIMIT_SOLUTION = {
     'fnl4461-n44600': 50,
     'pla33810-n33809': 20,
     'pla33810-n169045': 20,
-    'pla33810-n338090': 20,
+    'pla33810-n338090': 20
 }
 
 class MOEA:
@@ -54,9 +53,9 @@ class MOEA:
             self.weight_list.append(int(row[2]))         # weights of individual bags
             self.item_location.append(int(row[3]))        # List entail the i item in which city
 
-        #list_zip = zip(self.item_location, self.profit_list, self.weight_list)
-        #list_zip_sorted = sorted(list_zip)
-        #self.item_location, self.profit_list, self.weight_list = zip(*list_zip_sorted)
+        list_zip = zip(self.item_location, self.profit_list, self.weight_list)
+        list_zip_sorted = sorted(list_zip)
+        self.item_location, self.profit_list, self.weight_list = zip(*list_zip_sorted)
 
     # Task 2: Generate initial population
     def generate_initial_population(self, size_p):
@@ -68,7 +67,7 @@ class MOEA:
         '''
         for _ in range(size_p):
             #Generate TSP initial population
-            route = random.sample(range(self.number_of_cities), self.number_of_cities)
+            route = random.sample(range(1, self.number_of_cities+1), self.number_of_cities)
             #Generate KP initial population
             number_of_items = len(self.item_location)
             #stolen_items = np.random.randint(2, size=number_of_items)
@@ -94,7 +93,6 @@ class MOEA:
                     self.profit_list,
                     self.weight_list,
                     self.item_location,
-                    self.renting_ratio,
                     route,
                     stolen_items
                 )
@@ -423,8 +421,9 @@ class MOEA:
         plt.grid()
         plt.show()
 
-    def export_result(self, team_name, dir):
-        with open(f'{dir}/{team_name}/{team_name}_{self.test_name}.f','w') as f:
+    def export_result(self):
+        DIR = 'test_results/'
+        with open(f'{DIR}/TeamU_{self.test_name}.f','w') as f:
             count = 0
             for solution in self.population[self.fronts[0]]:
                 f.write(f"{solution.travelling_time} {solution.total_profit}\n")
@@ -432,7 +431,7 @@ class MOEA:
                 if count == LIMIT_SOLUTION[self.test_name]:
                     break
 
-        with open(f'{dir}/{team_name}/{team_name}_{self.test_name}.x','w') as f:
+        with open(f'{DIR}/TeamU_{self.test_name}.x','w') as f:
             count = 0
             for solution in self.population[self.fronts[0]]:
                 f.write(f"{str(solution.route)[1:-1].replace(',', '')}\n")
@@ -509,7 +508,6 @@ class MOEA:
                         self.profit_list,
                         self.weight_list,
                         self.item_location,
-                        self.renting_ratio,
                         new_route_c,
                         new_stolen_c
                     )
@@ -523,7 +521,6 @@ class MOEA:
                         self.profit_list,
                         self.weight_list,
                         self.item_location,
-                        self.renting_ratio,
                         new_route_d,
                         new_stolen_d
                     )

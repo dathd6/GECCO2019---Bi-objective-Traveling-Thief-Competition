@@ -16,7 +16,7 @@ def fast_non_dominated_sort(F, **kwargs):
 
     # final rank that will be returned
     n_ranked = 0
-    ranked = np.zeros(n)
+    ranked = np.zeros(n, dtype=np.int)
 
     # for each individual a list of all individuals that are dominated by this one
     is_dominating = [[] for _ in range(n)]
