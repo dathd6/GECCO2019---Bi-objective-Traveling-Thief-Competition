@@ -566,7 +566,7 @@ class MOEA:
             neighbor[i] = 1 - neighbor[i]
             yield neighbor
     
-    def local_search(weight_list, profit_list, knapsack_capacity, max_iter=10):
+    def local_search(weight_list, profit_list, knapsack_capacity, max_iter=100):
         """
         Performs local search to find an optimal or near-optimal solution to the knapsack problem.
     
