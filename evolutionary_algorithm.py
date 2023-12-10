@@ -52,7 +52,11 @@ class MOEA:
         for row in content_list:
             self.profit_list.append(int(row[1]))         #profits of each bags in the nodes 
             self.weight_list.append(int(row[2]))         # weights of individual bags
-            self.item_location.append(int(row[3]))        # List entail the i item in which city
+            self.item_location.append(int(row[3]) - 1)        # List entail the i item in which city
+        
+        self.profit_list = np.array(self.profit_list)
+        self.weight_list = np.array(self.weight_list)
+        self.item_location = np.array(self.item_location)
 
         #list_zip = zip(self.item_location, self.profit_list, self.weight_list)
         #list_zip_sorted = sorted(list_zip)
@@ -66,13 +70,24 @@ class MOEA:
         '''
         Generate initial population
         '''
+        total_weight = 0
         for _ in range(size_p):
             #Generate TSP initial population
-            route = random.sample(range(self.number_of_cities), self.number_of_cities)
+            route = [0] + random.sample(range(1, self.number_of_cities), self.number_of_cities - 1)
             #Generate KP initial population
             number_of_items = len(self.item_location)
+            stolen_items = []
+            
+            stolen_items = [0] * number_of_items
+            for i in random.sample(range(number_of_items), number_of_items):
+                if total_weight <= self.knapsack_capacity:
+                    stolen_items[i] = random.choice([0] * 4 + [1])
+                    if stolen_items[i] == 1:
+                        total_weight = total_weight + self.weight_list[i]
+                else:
+                    break
             #stolen_items = np.random.randint(2, size=number_of_items)
-            stolen_items = [random.choice([0,1]) for _ in range(number_of_items)]
+            #stolen_items = [random.choice([0,1]) for _ in range(number_of_items)]
             '''
             #The total pack weight cannot over capasity
             total_weight = 0
@@ -333,6 +348,7 @@ class MOEA:
         returns
             children of crossover
         '''
+        childs = []
         p1 = copy.deepcopy(parent_A)
         p2 = copy.deepcopy(parent_B)
         # parent_A, parent_B = parent_A.tolist(), parent_B.tolist() # Convert parents to lists
@@ -343,10 +359,14 @@ class MOEA:
 
     # Task 14: Mutation for KP (inversion mutation)
     def kp_mutation(self, parent):
-        point1, point2 = sorted(random.sample(range(len(parent)), 2))  # choose 2 different points
-        sub = parent[point1:point2 + 1]  # get the subsequence from z
-        parent[point1:point2 + 1] = sub[::-1]  # reverse the subsequence
-        return parent  # return the mutated parent(new stolen_items
+        if np.random.rand() < .4:
+            point1, point2 = sorted(random.sample(range(len(parent)), 2))  # choose 2 different points
+            sub = parent[point1:point2 + 1]  # get the subsequence from z
+            parent[point1:point2 + 1] = sub[::-1]  # reverse the subsequence
+        else:
+            point = random.sample(range(len(parent)), 1)[0]
+            parent[point] = 1 - parent[point]
+        return parent
 
     # Task 24: Non-dominated sorting
     def non_dominated_sorting(self):
@@ -495,6 +515,7 @@ class MOEA:
                     route_child_a, route_child_b = self.tsp_two_points_crossover(parents[0].route, parents[1].route)
                 else:
                     route_child_a, route_child_b = self.tsp_ordered_crossover(parents[0].route, parents[1].route)
+
                 stolen_child_a, stolen_child_b = self.kp_crossover(parents[0].stolen_items, parents[1].stolen_items)
                 new_route_c, new_route_d = self.tsp_inversion_mutation(route_child_a, route_child_b)
                 new_stolen_c = self.kp_mutation(stolen_child_a) 

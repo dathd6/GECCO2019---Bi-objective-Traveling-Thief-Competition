@@ -7,8 +7,8 @@ class TTP:
         self.knapsack_capacity = knapsack_capacity
         self.min_speed = min_speed
         self.max_speed = max_speed
-        self.profit_list = profit_list
-        self.weight_list = weight_list
+        self.profit_list = np.array(profit_list)
+        self.weight_list = np.array(weight_list)
         self.item_location = np.array(item_location)
         self.number_of_cities = len(self.distance_matrix)
 
@@ -16,9 +16,16 @@ class TTP:
         self.stolen_items = stolen_items
         self.renting_ratio = renting_ratio
 
-        self.travelling_time = self.calc_fitness_travelling_time() 
-        # self.total_profit = self.calc_fitness_total_profit() - self.travelling_time * self.renting_ratio
-        self.total_profit = self.calc_fitness_total_profit()
+        self.total_weight = 0
+        for i, w in enumerate(self.stolen_items):
+            if w == 1:
+                self.total_weight += self.weight_list[i]
+        if self.total_weight > self.knapsack_capacity:
+            self.travelling_time = np.inf
+            self.total_profit = 0
+        else:
+            self.travelling_time = self.calc_fitness_travelling_time() 
+            self.total_profit = self.calc_fitness_total_profit()
     
     # Task 19: Compare solution
     def __gt__(self, other):
