@@ -62,6 +62,7 @@ class MOEA:
         #list_zip_sorted = sorted(list_zip)
         #self.item_location, self.profit_list, self.weight_list = zip(*list_zip_sorted)
 
+    # Task38: KP dynamic selection
     def knapsack_dp(self, values, weights, capacity):
         self.profit_list=values
         self.weight_list=weights
@@ -91,14 +92,38 @@ class MOEA:
     def generate_initial_population(self, size_p):
         self.size_p = size_p
         population = []
-
+        
+        '''
+        Generate initial population
+        '''
+        total_weight = 0
         for _ in range(size_p):
-            # Generate TSP initial population
+            #Generate TSP initial population
             route = [0] + random.sample(range(1, self.number_of_cities), self.number_of_cities - 1)
-
-            # Generate KP initial population using dynamic programming
-            stolen_items = self.knapsack_dp(self.profit_list, self.weight_list, self.knapsack_capacity)
-
+            #Generate KP initial population
+            number_of_items = len(self.item_location)
+            
+            stolen_items = [0] * number_of_items
+            for i in random.sample(range(number_of_items), number_of_items):
+                if total_weight <= self.knapsack_capacity:
+                    stolen_items[i] = random.choice([0] * 3 + [1])
+                    total_weight = total_weight + self.weight_list[i]
+                else:
+                    break
+            #stolen_items = np.random.randint(2, size=number_of_items)
+            #stolen_items = [random.choice([0,1]) for _ in range(number_of_items)]
+            '''
+            #The total pack weight cannot over capasity
+            total_weight = 0
+            while True:
+                stolen_items = [random.choice([0,1]) for _ in range((number_of_cities-1)*item_num)]
+                for i, item in enumerate(stolen_item):
+                    if item == 1:
+                        total_weight += weight_list_sorted[i]
+                if total_weight <= knapscak_capacity:
+                    break
+            '''
+            
             population.append(
                 TTP(
                     self.distance_matrix,
