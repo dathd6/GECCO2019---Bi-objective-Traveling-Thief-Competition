@@ -106,8 +106,17 @@ class MOEA:
             stolen_items = [0] * number_of_items
             for i in random.sample(range(number_of_items), number_of_items):
                 if total_weight <= self.knapsack_capacity:
+                    '''                  
                     stolen_items[i] = random.choice([0] * 3 + [1])
                     total_weight = total_weight + self.weight_list[i]
+                    '''
+                    # Convert renting_ratio to probability
+                    probability = 1 / (self.renting_ratio + 1)
+                    stolen_items[i] = 1 if random.random() < probability else 0
+
+                    if stolen_items[i] == 1:
+                        total_weight += self.weight_list[i]
+
                 else:
                     break
             #stolen_items = np.random.randint(2, size=number_of_items)
