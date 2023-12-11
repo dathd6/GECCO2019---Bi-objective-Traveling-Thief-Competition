@@ -557,8 +557,16 @@ class MOEA:
         self.non_dominated_sorting()
         self.calc_crowding_distance()
 
-    # Task 37: local search for kp
 
+
+
+
+
+
+    
+
+    
+    # Task 27: local search for kp
     def evaluate_solution(solution, weight_list, profit_list, knapsack_capacity):
         """
         Evaluates a solution to the knapsack problem, calculating its total profit and weight.
@@ -641,3 +649,77 @@ class MOEA:
             current_solution_value = best_solution_value
             print(current_solution_value)
         return best_solution, best_solution_value
+
+    # Task 28: local search for tsp(using simulated annealing function)
+    def calculate_total_distance(self, route):
+        """
+        Calculate the total distance of the given route based on the distance matrix.
+    
+        :param route: A list of city indices representing the visiting order.
+        :param distance_matrix: A 2D list where distance_matrix[i][j] represents the distance from city i to city j.
+        :return: Total distance of the route.
+        """
+
+        distance_matrix = self.distance_matrix
+        total_distance = 0
+        for i in range(len(route)):
+            total_distance += distance_matrix[route[i]][route[(i + 1) % len(route)]]
+        return total_distance
+    
+    def get_random_neighbor(route):
+        """
+        Generate a random neighbor of the current route by swapping two cities.
+    
+        This function helps in exploring the search space by creating slight variations
+        of the current route.
+    
+        :param route: A list of city indices representing the visiting order.
+        :return: A neighbor route.
+        """
+        a, b = random.sample(range(len(route)), 2)
+        new_route = route[:]
+        new_route[a], new_route[b] = new_route[b], new_route[a]
+        return new_route
+    
+    def simulated_annealing_tsp(self, initial_temp=100, cooling_rate=0.99, min_temp=1):
+        """
+        Performs simulated annealing to find a short route for the TSP problem.
+    
+        The algorithm uses a probabilistic technique to escape local optima by allowing
+        worse solutions to be accepted with a certain probability.
+    
+        :param distance_matrix: A 2D list where distance_matrix[i][j] represents the distance from city i to city j.
+        :param initial_temp: Starting temperature for the annealing process.
+        :param cooling_rate: Rate at which the temperature decreases in each iteration.
+        :param min_temp: Minimum temperature at which the annealing process terminates.
+        :return: Tuple (best route, length of the best route).
+        """
+        distance_matrix = self.distance_matrix
+        num_cities = len(distance_matrix)
+        current_route = list(range(num_cities))
+        random.shuffle(current_route)
+        current_distance = calculate_total_distance(current_route, distance_matrix)
+    
+        best_route = current_route[:]
+        best_distance = current_distance
+    
+        temperature = initial_temp
+    
+        while temperature > min_temp:
+            neighbor_route = get_random_neighbor(current_route)
+            neighbor_distance = calculate_total_distance(neighbor_route, distance_matrix)
+    
+            # Decide whether to accept the neighbor route
+            if neighbor_distance < current_distance or random.random() < math.exp((current_distance - neighbor_distance) / temperature):
+                current_route = neighbor_route
+                current_distance = neighbor_distance
+    
+                # Update the best found route if the new route is shorter
+                if neighbor_distance < best_distance:
+                    best_route = neighbor_route[:]
+                    best_distance = neighbor_distance
+    
+            # Cool down the temperature
+            temperature *= cooling_rate
+    
+        return best_route, best_distance
