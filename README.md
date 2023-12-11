@@ -1,9 +1,9 @@
-#ECMM409 - Group Coursework
+# ECMM409 - Group Coursework
 # Non-dominated Sorting Genetic Algorithm II (NSGA-II): The Travelling Theif Problem (TTP)
 
 **Please visit [Github repository](https://github.com/dathd6/GECCO2019---Bi-objective-Traveling-Thief-Competition) to see the README.md in better format**
 
-##About the project
+## About the project
 ### It's the University of Exeter NIC course group U coursework project. The coursework is to implement a Multi-Objective Evolutionary Algorithms to optimize the Travelling Theif Problem. Our goal is to apply Non-dominated Sorting Genetic Algorithm II (NSGA-II) to a series of experiments and provide solutions to the nine test instances in the competition.
 # 
 
@@ -61,10 +61,10 @@
 
 ## Getting Strated
 
-####Pull the project source files from GitHub
-####Use any programme editor
-####Install dependencies
-####Follow execution steps below
+#### Pull the project source files from GitHub
+#### Use any programme editor
+#### Install dependencies
+#### Follow execution steps below
 
 ## Execution
 1. Open main.ipynb
@@ -244,10 +244,10 @@
 8. Go to folder (evaluation) Open evaluation.ipynb
 9. Run whole section and Get performance result
 
-##Team Information
-####Team U of ECMM409 - Nature Inspired Computation
+## Team Information
+#### Team U of ECMM409 - Nature Inspired Computation
 
-####Team members:
+#### Team members:
 |Name|Student ID|
 | :- | :- |
 |DUC DAT HOANG|0000|
