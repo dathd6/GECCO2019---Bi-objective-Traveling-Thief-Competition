@@ -12,13 +12,13 @@
 - Programming language: Python
 - Version: 3.11.5
 
-## Dependencies:
+## Dependencies
 - [matplotlib](https://matplotlib.org)
 
 - [pandas](https://pandas.pydata.org/)
 - [numpy](https://numpy.org/)
 
-## File structure:
+## File structure
 
 - [9<u> </u>test<u> </u>problems/](./9_test_problems): Folder (9<u> </u>test<u> </u>problems) contains 9 test problem including problem name, dimension(city number), items number, knapsack capasity, MIN&MAX SPEED, rentting ratio, coordinates of the cities, profit&weight of items and location of items
     + a280-n279.txt
