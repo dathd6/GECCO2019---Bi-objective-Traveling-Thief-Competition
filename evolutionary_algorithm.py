@@ -355,7 +355,26 @@ class MOEA:
         crossover_point = np.random.randint(0,len(p1)) # Generate random crossover point
         child_A = p1[:crossover_point] + p2[crossover_point:] # Gererate child_A from parents
         child_B = p2[:crossover_point] + p1[crossover_point:] # Generate child_B from parents
+
+        child_A = self.KP_repair(child_A) # repair by removing worst val/weight items until under KP capacity
+        child_B = self.KP_repair(child_B) # repair by removing worst val/weight items until under KP capacity
+
         return child_A, child_B
+    
+    def KP_repair(self, child):
+        # Removes items from KP based on value to weight ratio until KP is below weight limit
+        total_weight = sum(self.weight_list[i] * item for i, item in enumerate(child)) # obtain total weight
+        while total_weight > self.knapsack_capacity: # repeat until KP is below weight limit
+            included_items_vw_ratios = []
+            for i, item in enumerate(child):
+                if item == 1:  # only consider items in KP
+                    vw_ratio = self.profit_list[i] / self.weight_list[i] # calculate value to weight ratio
+                    included_items_vw_ratios.append((i, vw_ratio)) # record index and value to weight ratio
+            included_items_vw_ratios.sort(key=lambda x: x[1]) # sort to find worst items in KP
+            index_to_remove = included_items_vw_ratios[0][0] # index of worst item
+            child[index_to_remove] = 0  # remove worst item from KP
+            total_weight = sum(self.weight_list[i] * item for i, item in enumerate(child)) # recalculate weight
+        return child
 
     # Task 14: Mutation for KP (inversion mutation)
     def kp_mutation(self, parent):
@@ -366,6 +385,7 @@ class MOEA:
         else:
             point = random.sample(range(len(parent)), 1)[0]
             parent[point] = 1 - parent[point]
+        parent = self.KP_repair(parent) # repair by removing worst val/weight items until under KP capacity
         return parent
 
     # Task 24: Non-dominated sorting
