@@ -62,44 +62,43 @@ class MOEA:
         #list_zip_sorted = sorted(list_zip)
         #self.item_location, self.profit_list, self.weight_list = zip(*list_zip_sorted)
 
+    def knapsack_dp(self, values, weights, capacity):
+        self.profit_list=values
+        self.weight_list=weights
+        self.knapsack_capacity=capacity
+        n = len(values)
+        dp = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+        chosen = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            for w in range(1, capacity + 1):
+                if weights[i - 1] <= w and values[i - 1] + dp[i - 1][w - weights[i - 1]] > dp[i - 1][w]:
+                    dp[i][w] = values[i - 1] + dp[i - 1][w - weights[i - 1]]
+                    chosen[i][w] = 1
+                else:
+                    dp[i][w] = dp[i - 1][w]
+
+        decisions = [0] * n
+        w = capacity
+        for i in range(n, 0, -1):
+            if chosen[i][w]:
+                decisions[i - 1] = 1
+                w -= weights[i - 1]
+
+        return decisions
+
     # Task 2: Generate initial population
     def generate_initial_population(self, size_p):
         self.size_p = size_p
         population = []
-        
-        '''
-        Generate initial population
-        '''
-        total_weight = 0
+
         for _ in range(size_p):
-            #Generate TSP initial population
+            # Generate TSP initial population
             route = [0] + random.sample(range(1, self.number_of_cities), self.number_of_cities - 1)
-            #Generate KP initial population
-            number_of_items = len(self.item_location)
-            stolen_items = []
-            
-            stolen_items = [0] * number_of_items
-            for i in random.sample(range(number_of_items), number_of_items):
-                if total_weight <= self.knapsack_capacity:
-                    stolen_items[i] = random.choice([0] * 4 + [1])
-                    if stolen_items[i] == 1:
-                        total_weight = total_weight + self.weight_list[i]
-                else:
-                    break
-            #stolen_items = np.random.randint(2, size=number_of_items)
-            #stolen_items = [random.choice([0,1]) for _ in range(number_of_items)]
-            '''
-            #The total pack weight cannot over capasity
-            total_weight = 0
-            while True:
-                stolen_items = [random.choice([0,1]) for _ in range((number_of_cities-1)*item_num)]
-                for i, item in enumerate(stolen_item):
-                    if item == 1:
-                        total_weight += weight_list_sorted[i]
-                if total_weight <= knapscak_capacity:
-                    break
-            '''
-            
+
+            # Generate KP initial population using dynamic programming
+            stolen_items = self.knapsack_dp(self.profit_list, self.weight_list, self.knapsack_capacity)
+
             population.append(
                 TTP(
                     self.distance_matrix,
