@@ -554,7 +554,7 @@ class MOEA:
 
 
     # Task 36: Optimization
-    def optimize(self, generations, tournament_size, crossover='OX'):
+    def optimize(self, generations, tournament_size):
         self.size_t = tournament_size
 
         for generation in range(generations):
@@ -564,7 +564,7 @@ class MOEA:
             self.calc_crowding_distance()
             while len(self.population) + len(new_solutions) < 2 * self.size_p:
                 parents = self.tournament_selection()
-                if crossover == 'PMX':
+                if np.random.rand() < .5:
                     route_child_a, route_child_b = self.tsp_two_points_crossover(parents[0].route, parents[1].route)
                 else:
                     route_child_a, route_child_b = self.tsp_ordered_crossover(parents[0].route, parents[1].route)
